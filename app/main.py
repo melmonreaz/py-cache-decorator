@@ -1,16 +1,19 @@
+import functools
 from typing import Callable
 
 
 def cache(func: Callable) -> Callable:
     memory = {}
 
+    @functools.wraps(func)
     def wrapper(*args, **kwargs) -> int:
         # nonlocal memory
-        if args not in memory:
-            memory[args] = func(*args, **kwargs)
+        key = (args, tuple(sorted(kwargs.items())))
+        if key not in memory:
+            memory[key] = func(*args, **kwargs)
             print("Calculating new result")
-            return memory[args]
+            return memory[key]
         print("Getting from cache")
-        return memory[args]
+        return memory[key]
 
     return wrapper
